@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div>11111</div>
+<script>
+    window.onkeydown = window.onkeyup = window.onkeypress = function (event) {
+        // 判断是否按下F12，F12键码为123
+        if (event.keyCode = 123) {
+            event.preventDefault(); // 阻止默认事件行为
+            window.event.returnValue = false;
+        }
+    }
+    // 为右键添加自定义事件，可以禁用
+    window.oncontextmenu = function() {
+        event.preventDefault(); // 阻止默认事件行为
+        return false;
+    }
+    
+    // 通过设置对象的属性的getter方法
+    // 原理：当控制台在输出的某个对象时，是会去get对象属性的，因此会调用到属性的getter。
+    function checkDebugByGetter () {
+        var checkStatus;
+        var element = document.createElement('any');
+        element.__defineGetter__('id', function() {
+            checkStatus = 'on';
+        });
+        var interval = setInterval(function() {
+            checkStatus = 'off';
+            console.log(element);
+            console.clear();
+            if (checkStatus === 'on') {
+                clearInterval(interval)
+                window.location.reload()
+            }
+        }, 1000)
+    }
+    checkDebugByGetter();
+
+    // 打开控制台时会走debugger，判断时间间隔过大就刷新
+    // 缺陷：debugger时还是可以选中dom的，要看还是看得到
+    function checkDebugByDebugTime() {
+        function testDebuger() {
+            var d = new Date();
+            debugger;
+            if (new Date() - d > 10) {
+                window.location.reload();
+                return true;
+            }
+            return false;
+        }
+        function start() {
+            while (testDebuger()) {
+                testDebuger();
+            }
+        }
+        if (!testDebuger()) {
+            window.onblur = function () {
+                setTimeout(function () {
+                    start();
+                }, 500)
+            }
+        }else {
+            start();
+        }
+    }
+    // checkDebugByDebugTime();
+</script>
+</body>
+</html>
